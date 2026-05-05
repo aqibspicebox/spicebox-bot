@@ -1,78 +1,39 @@
 from flask import Flask, request
 import requests
-import json
 
 app = Flask(__name__)
 
-# ── Credentials ──────────────────────────────────────────
-
+# ── Credentials ─────────────────────────
 VERIFY_TOKEN = "spicebox123"
-ACCESS_TOKEN = "EAAW66CLlGCsBRdd8ELjYkXpAVe0uBSXFyKpYoICC48QcE512oy33lKdXUTwN4R35fCTvpkVfXAi9IhGlG4B1tiNJWZATzfmZCPuhm1xHqMLbahNQ5IOZBeW8EhXG4nMYpogkCAqO4fJskSzs21BB6z5d4vFzgcmdTFrLWZBp5KRGeS1nTAJSu2OCdL329SWRR6Xh9M1xpROUGMHvAN1GP0LQWtXnKWrVhECOabuh69V0PwPpKf1wJe8UtEZCXRFOah2sYXTo1BzW2QDnR2D5Q1SRgcm5OhCZBxxAZDZD"
+ACCESS_TOKEN = "EAAW66CLlGCsBRR3c8DdMGEyfdAHwbCvr3rBRXAUbe2SXJiGblikZAiJZBVDNZBSOWFaDPz889ZAmDpfOii1QcZA0VWkDnZAZAoNTT1k2nfA0qaylIaTTR2OGLIc18wWIvabPPTeMgkS7SrTTLupdXR0d8JkdAMXR0hWFNkfuZCB15q7UQf5ttB4ZARvr1iMmFUeqaf5j1OvVTKiZAmmhMWaDH5CLBg5QcLxGjz9ZAZAP0V0c9voMJZB37OrHmOjcmkJGV7XqbzE2QTcH6ZAuzqlxhgMMXgNfY91O34EMx1NAoZD"
 PHONE_NUMBER_ID = "1138025436056275"
 
-# ── Menu ─────────────────────────────────────────────────
-
+# ── MENU WITH IMAGES ───────────────────
 MENU = {
     "desi": {
-        "Chicken Karahi": 1750,
-        "Chicken Handi": 1250,
-        "Mutton Karahi": 2100,
-        "Chicken Biryani": 350,
-        "Bar B Q Boti": 699,
-        "Seek Kabab": 699,
+        "Chicken Karahi": {"price": 700, "img": "https://imgur.com/a/tg5qcaX"},
+        "Chicken Handi": {"price": 1250, "img": "https://imgur.com/a/tg5qcaX"},
     },
     "chinese": {
-        "Hot & Sour Soup": 250,
-        "Chicken Chowmein": 750,
-        "Manchurian Chicken": 892,
-        "Egg Fried Rice": 699,
-        "Chicken Noodles": 450,
+        "Chicken Chowmein": {"price": 750, "img": "PUT_IMAGE_URL"},
     },
     "fries": {
-        "Plane Fries": 219,
-        "Flavour Fries": 280,
-        "Pizza Fries": 470,
-        "Nuggets 6 Pcs": 350,
-        "Appetizer with Dip": 599,
+        "Pizza Fries": {"price": 470, "img": "https://imgur.com/7vDui2I"},
     }
 }
 
-# ── User Sessions ─────────────────────────────────────────
-
 sessions = {}
 
-# ══════════════════════════════════════════════════════════
-# SEND FUNCTIONS
-# ══════════════════════════════════════════════════════════
-
+# ── SEND FUNCTIONS ─────────────────────
 def send_text(to, text):
-    """Simple text message"""
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "text",
-        "text": {"body": text}
-    }
-    try:
-        requests.post(url, headers=headers, json=data)
-    except Exception as e:
-        print(f"Error sending text: {e}")
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}", "Content-Type": "application/json"}
+    data = {"messaging_product": "whatsapp","to": to,"type": "text","text": {"body": text}}
+    requests.post(url, headers=headers, json=data)
 
 def send_buttons(to, text, buttons):
-    """
-    Send message with up to 3 clickable buttons
-    buttons = [{"id": "btn1", "title": "Button 1"}, …]
-    """
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}", "Content-Type": "application/json"}
     data = {
         "messaging_product": "whatsapp",
         "to": to,
@@ -82,32 +43,17 @@ def send_buttons(to, text, buttons):
             "body": {"text": text},
             "action": {
                 "buttons": [
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": btn["id"],
-                            "title": btn["title"][:20]
-                        }
-                    } for btn in buttons[:3]
+                    {"type": "reply","reply": {"id": b["id"],"title": b["title"][:20]}}
+                    for b in buttons[:3]
                 ]
             }
         }
     }
-    try:
-        requests.post(url, headers=headers, json=data)
-    except Exception as e:
-        print(f"Error sending buttons: {e}")
+    requests.post(url, headers=headers, json=data)
 
 def send_list(to, text, sections):
-    """
-    Send list menu with multiple items
-    sections = [{"title": "Category", "rows": [{"id": "id1", "title": "Item", "description": "Rs 500"}]}]
-    """
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}", "Content-Type": "application/json"}
     data = {
         "messaging_product": "whatsapp",
         "to": to,
@@ -115,332 +61,141 @@ def send_list(to, text, sections):
         "interactive": {
             "type": "list",
             "body": {"text": text},
-            "action": {
-                "button": "View Options",
-                "sections": sections
-            }
+            "action": {"button": "View Options","sections": sections}
         }
     }
-    try:
-        requests.post(url, headers=headers, json=data)
-    except Exception as e:
-        print(f"Error sending list: {e}")
+    requests.post(url, headers=headers, json=data)
 
 def send_image(to, image_url, caption=""):
-    """Send image with optional caption"""
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}", "Content-Type": "application/json"}
     data = {
         "messaging_product": "whatsapp",
         "to": to,
         "type": "image",
-        "image": {
-            "link": image_url,
-            "caption": caption
-        }
+        "image": {"link": image_url, "caption": caption}
     }
-    try:
-        requests.post(url, headers=headers, json=data)
-    except Exception as e:
-        print(f"Error sending image: {e}")
+    requests.post(url, headers=headers, json=data)
 
-# ══════════════════════════════════════════════════════════
-# HELPER FUNCTIONS
-# ══════════════════════════════════════════════════════════
-
+# ── HELPERS ────────────────────────────
 def get_session(phone):
     if phone not in sessions:
-        sessions[phone] = {
-            "step": "welcome",
-            "cart": [],
-            "name": "",
-            "location": "",
-            "phone_num": "",
-            "current_cuisine": ""
-        }
+        sessions[phone] = {"step": "welcome","cart": [],"current_cuisine": ""}
     return sessions[phone]
 
 def cart_total(cart):
-    return sum(item["price"] for item in cart)
+    return sum(i["price"] for i in cart)
 
 def cart_text(cart):
     return "\n".join([f"• {i['name']} — Rs {i['price']}" for i in cart])
 
-# ══════════════════════════════════════════════════════════
-# MAIN FLOW
-# ══════════════════════════════════════════════════════════
-
+# ── MAIN FLOW ─────────────────────────
 def handle_message(phone, text, button_id=None):
     s = get_session(phone)
-    
-    # Use button_id if available, else use text
-    msg = (button_id or text).strip().lower()
+    msg = (button_id or text).lower()
 
-    # ── WELCOME ──────────────────────────────────────────
-    if msg in ["hi", "hello", "salam", "start", "helo", "hey"] or s["step"] == "welcome":
+    # WELCOME
+    if msg in ["hi","hello","start"] or s["step"]=="welcome":
         s["step"] = "main"
-        s["cart"] = []
-        send_buttons(phone,
-            "🌶️ *Welcome to Spice Box!*\n_Authentic Taste — DHA Phase 9, Lahore_\n\nHow can I help you today?",
-            buttons=[
-                {"id": "order", "title": "🛒 Order Now"},
-                {"id": "menu", "title": "📋 View Menu"},
-                {"id": "help", "title": "ℹ️ Help"},
-            ]
-        )
+        send_buttons(phone,"Welcome! Choose:",
+            [{"id":"order","title":"Order"},{"id":"menu","title":"Menu"}])
         return
 
-    # ── MAIN MENU ─────────────────────────────────────────
-    if s["step"] == "main":
-        if msg in ["order", "order now"]:
-            s["step"] = "cuisine"
-            send_buttons(phone,
-                "🍽️ *Select Cuisine Type:*",
-                buttons=[
-                    {"id": "desi", "title": "🍛 Desi Cuisine"},
-                    {"id": "chinese", "title": "🍜 Chinese"},
-                    {"id": "fries", "title": "🍟 Fries & Snacks"},
-                ]
-            )
+    # MAIN
+    if s["step"]=="main":
+        if msg=="order":
+            s["step"]="cuisine"
+            send_buttons(phone,"Select cuisine:",
+                [{"id":"desi","title":"Desi"},{"id":"chinese","title":"Chinese"},{"id":"fries","title":"Fries"}])
             return
 
-        elif msg in ["menu", "view menu"]:
-            # Send menu image first
-            send_image(phone,
-                "https://i.imgur.com/spicebox_menu.jpg",
-                "📋 Spice Box Full Menu"
-            )
-            # Then send text menu
-            menu_text = "📋 *Spice Box Menu:*\n\n"
-            menu_text += "🍛 *DESI CUISINE:*\n"
-            for k, v in MENU["desi"].items():
-                menu_text += f"• {k} — Rs {v}\n"
-            menu_text += "\n🍜 *CHINESE:*\n"
-            for k, v in MENU["chinese"].items():
-                menu_text += f"• {k} — Rs {v}\n"
-            menu_text += "\n🍟 *FRIES & SNACKS:*\n"
-            for k, v in MENU["fries"].items():
-                menu_text += f"• {k} — Rs {v}\n"
-            send_text(phone, menu_text)
-            send_buttons(phone,
-                "Ready to order? 😊",
-                buttons=[
-                    {"id": "order", "title": "🛒 Order Now"},
-                ]
-            )
-            return
+    # CUISINE
+    if s["step"]=="cuisine":
+        s["current_cuisine"]=msg
+        s["step"]="item"
 
-        elif msg in ["help"]:
-            send_text(phone,
-                "📞 *Spice Box Help:*\n\n"
-                "📍 Plaza B3, CCA Phase-9, DHA Lahore\n"
-                "📞 0329-4799993\n"
-                "📞 042-37250019\n\n"
-                "Reply *hi* to start ordering!"
-            )
-            return
+        rows=[]
+        for i,(name,data) in enumerate(MENU[msg].items()):
+            rows.append({"id":f"item_{i}","title":name,"description":f"Rs {data['price']}"})
 
-    # ── CUISINE SELECTION ─────────────────────────────────
-    if s["step"] == "cuisine":
-        if msg in ["desi", "chinese", "fries"]:
-            s["current_cuisine"] = msg
-            s["step"] = "item"
-            
-            items = list(MENU[msg].items())
-            
-            # Send as list menu
-            rows = []
-            for idx, (name, price) in enumerate(items):
-                rows.append({
-                    "id": f"item_{idx}",
-                    "title": name[:24],
-                    "description": f"Rs {price}"
-                })
-            
-            cuisine_names = {
-                "desi": "🍛 Desi Cuisine",
-                "chinese": "🍜 Chinese",
-                "fries": "🍟 Fries & Snacks"
-            }
-            
-            send_list(phone,
-                f"*{cuisine_names[msg]}*\nSelect your item:",
-                sections=[{
-                    "title": cuisine_names[msg],
-                    "rows": rows
-                }]
-            )
-            return
-
-    # ── ITEM SELECTION ────────────────────────────────────
-    if s["step"] == "item":
-        item_id = button_id or msg
-        
-        if item_id.startswith("item_"):
-            try:
-                idx = int(item_id.split("_")[1])
-                cuisine_items = list(MENU[s["current_cuisine"]].items())
-                
-                if 0 <= idx < len(cuisine_items):
-                    item_name, item_price = cuisine_items[idx]
-                    
-                    s["cart"].append({"name": item_name, "price": item_price})
-                    s["step"] = "more"
-                    
-                    send_buttons(phone,
-                        f"✅ *{item_name}* added!\n\n"
-                        f"🛒 *Cart:*\n{cart_text(s['cart'])}\n\n"
-                        f"💰 Total: Rs {cart_total(s['cart'])}",
-                        buttons=[
-                            {"id": "add_more", "title": "➕ Add More"},
-                            {"id": "checkout", "title": "✅ Checkout"},
-                        ]
-                    )
-            except (ValueError, IndexError) as e:
-                print(f"Error parsing item: {e}")
-                send_text(phone, "❌ Invalid selection. Please try again.")
-            return
-
-    # ── ADD MORE OR CHECKOUT ──────────────────────────────
-    if s["step"] == "more":
-        if msg in ["add_more", "add more"]:
-            s["step"] = "cuisine"
-            send_buttons(phone,
-                "🍽️ *Select Cuisine:*",
-                buttons=[
-                    {"id": "desi", "title": "🍛 Desi Cuisine"},
-                    {"id": "chinese", "title": "🍜 Chinese"},
-                    {"id": "fries", "title": "🍟 Fries & Snacks"},
-                ]
-            )
-            return
-            
-        elif msg in ["checkout"]:
-            s["step"] = "name"
-            send_text(phone, "👤 Please enter your *name*:")
-            return
-
-    # ── COLLECT NAME ──────────────────────────────────────
-    if s["step"] == "name":
-        s["name"] = text.title()
-        s["step"] = "location"
-        send_text(phone, "📍 Please enter your *delivery address*:")
+        send_list(phone,"Select item:",[{"title":"Menu","rows":rows}])
         return
 
-    # ── COLLECT LOCATION ──────────────────────────────────
-    if s["step"] == "location":
-        s["location"] = text.title()
-        s["step"] = "phone_num"
-        send_text(phone, "📱 Please enter your *phone number*:")
-        return
+    # ITEM SELECT
+    if s["step"]=="item":
+        if msg.startswith("item_"):
+            idx=int(msg.split("_")[1])
+            items=list(MENU[s["current_cuisine"]].items())
+            name,data=items[idx]
 
-    # ── COLLECT PHONE ─────────────────────────────────────
-    if s["step"] == "phone_num":
-        s["phone_num"] = text
-        s["step"] = "confirm"
-        
-        summary = (
-            f"📋 *Order Summary:*\n\n"
-            f"{cart_text(s['cart'])}\n\n"
-            f"👤 Name: {s['name']}\n"
-            f"📍 Address: {s['location']}\n"
-            f"📱 Phone: {s['phone_num']}\n\n"
-            f"💰 *Total: Rs {cart_total(s['cart'])}*"
-        )
-        
-        send_buttons(phone, summary,
-            buttons=[
-                {"id": "confirm", "title": "✅ Confirm Order"},
-                {"id": "cancel", "title": "❌ Cancel"},
-            ]
-        )
-        return
+            s["selected"]={"name":name,"price":data["price"],"img":data["img"]}
+            s["step"]="action"
 
-    # ── CONFIRM ORDER ─────────────────────────────────────
-    if s["step"] == "confirm":
-        if msg in ["confirm"]:
-            total = cart_total(s["cart"])
-            send_text(phone,
-                f"✅ *Order Confirmed!*\n\n"
-                f"🙏 Thank you *{s['name']}*!\n"
-                f"Your food is being prepared 🔥\n\n"
-                f"📍 Delivery to: {s['location']}\n"
-                f"💰 Total: Rs {total}\n\n"
-                f"📞 For queries: 0329-4799993\n\n"
-                f"_Spice Box — Authentic Taste_ 🌶️"
-            )
-            sessions.pop(phone, None)
-            return
-            
-        elif msg in ["cancel"]:
-            sessions.pop(phone, None)
             send_buttons(phone,
-                "❌ Order cancelled!\nWant to start again?",
-                buttons=[
-                    {"id": "order", "title": "🛒 Order Again"},
-                ]
-            )
+                f"{name} — Rs {data['price']}",
+                [{"id":"view","title":"View Image"},{"id":"add","title":"Order Now"}])
             return
 
-    # ── DEFAULT ───────────────────────────────────────────
-    send_buttons(phone,
-        "🌶️ *Spice Box*\nHow can I help you?",
-        buttons=[
-            {"id": "order", "title": "🛒 Order Now"},
-            {"id": "menu", "title": "📋 View Menu"},
-            {"id": "help", "title": "ℹ️ Help"},
-        ]
-    )
+    # ACTION
+    if s["step"]=="action":
+        if msg=="view":
+            send_image(phone,s["selected"]["img"],s["selected"]["name"])
+            send_buttons(phone,"Next?",
+                [{"id":"add","title":"Order Now"},{"id":"back","title":"Back"}])
+            return
 
-# ══════════════════════════════════════════════════════════
-# WEBHOOK
-# ══════════════════════════════════════════════════════════
+        if msg=="add":
+            s["cart"].append(s["selected"])
+            s["step"]="more"
+            send_buttons(phone,
+                f"Added!\n{cart_text(s['cart'])}\nTotal: {cart_total(s['cart'])}",
+                [{"id":"more","title":"Add More"},{"id":"checkout","title":"Checkout"}])
+            return
 
+        if msg=="back":
+            s["step"]="cuisine"
+            send_buttons(phone,"Select cuisine:",
+                [{"id":"desi","title":"Desi"},{"id":"chinese","title":"Chinese"},{"id":"fries","title":"Fries"}])
+            return
+
+    # MORE
+    if s["step"]=="more":
+        if msg=="more":
+            s["step"]="cuisine"
+            send_buttons(phone,"Select cuisine:",
+                [{"id":"desi","title":"Desi"},{"id":"chinese","title":"Chinese"},{"id":"fries","title":"Fries"}])
+            return
+
+        if msg=="checkout":
+            send_text(phone,"Order placed! ✅")
+            sessions.pop(phone)
+            return
+
+# ── WEBHOOK ───────────────────────────
 @app.route("/webhook", methods=["GET"])
 def verify():
-    mode = request.args.get("hub.mode")
-    token = request.args.get("hub.verify_token")
-    challenge = request.args.get("hub.challenge")
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return challenge, 200
-    return "Error", 403
+    if request.args.get("hub.verify_token")==VERIFY_TOKEN:
+        return request.args.get("hub.challenge")
+    return "error"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json()
+    data=request.get_json()
     try:
-        entry = data["entry"][0]
-        changes = entry["changes"][0]
-        value = changes["value"]
+        msg=data["entry"][0]["changes"][0]["value"]["messages"][0]
+        phone=msg["from"]
 
-        if "messages" in value:
-            msg = value["messages"][0]
-            phone = msg["from"]
-            
-            # Check if button reply
-            if msg["type"] == "interactive":
-                interactive = msg["interactive"]
-                
-                if interactive["type"] == "button_reply":
-                    button_id = interactive["button_reply"]["id"]
-                    handle_message(phone, button_id, button_id=button_id)
-                    
-                elif interactive["type"] == "list_reply":
-                    list_id = interactive["list_reply"]["id"]
-                    handle_message(phone, list_id, button_id=list_id)
-                    
-            # Regular text message
-            elif msg["type"] == "text":
-                text = msg["text"]["body"]
-                handle_message(phone, text)
-                
-    except Exception as e:
-        print(f"Error: {e}")
+        if msg["type"]=="interactive":
+            if "button_reply" in msg["interactive"]:
+                handle_message(phone,msg["interactive"]["button_reply"]["id"],msg["interactive"]["button_reply"]["id"])
+            elif "list_reply" in msg["interactive"]:
+                handle_message(phone,msg["interactive"]["list_reply"]["id"],msg["interactive"]["list_reply"]["id"])
+        elif msg["type"]=="text":
+            handle_message(phone,msg["text"]["body"])
+    except:
+        pass
 
-    return "OK", 200
+    return "ok"
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+if __name__=="__main__":
+    app.run(port=5000)

@@ -7,7 +7,7 @@ app = Flask(**name**)
 # ── Credentials ──────────────────────────────────────────
 
 VERIFY_TOKEN = “spicebox123”
-ACCESS_TOKEN = “EAAW66CLlGCsBRfmAKY3TWqDJGJZAxLpvTnqz4N8E5do34XVF98V3gy1xX98LszhJkC2Q9FD98g3fmUVHyKmWqhdq0VAh1zbyi5ESLQQs5CmFlm3UyPcLDg5uCYNk8QMcEw9XcrZC0ZAieLb4ymP2bWaUWuHyX9CqIKDjxRPFw0JyUcqevGDcsmZB8bYbO05nhR0PRx8OVXZAAFd2i1Y64JOag5i9uj3PdSf9PTSDmbvZALWEtiybgKx9ufoBd5qT5E0h9PJGnVLqLrW0MM7HFMDWDwaqpWSZC4j6AZDZD”
+ACCESS_TOKEN = “EAAW66CLlGCsBRUhkIhGL9K0uDhggQynmB1JLlZCbpGeiHwingMt9jiOOmNWjB22ifmNvN7QlZCqV39zysozeYCSZBgg4AKp7dS9TLxZAcZAufAbPqZBQECWtxSe2MSHeZAmrZBBsm8LrZBv9bL0ItMvvIlxuKn3RTb633MJLYtcSK6KIisVn0cOMt7uGfAhKARjkNILxWoEHE98ogrCSz8r6x2rKZBJIo7ts04lhmKWPMqeVnZAibXgzkXuWhbKwa6Ipis33c15wopoKtkUMZCss50iDOGthFYktgZCG63KcZD”
 PHONE_NUMBER_ID = “1138025436056275”
 
 # ── Menu ─────────────────────────────────────────────────
@@ -49,9 +49,9 @@ sessions = {}
 
 def send_text(to, text):
 “”“Simple text message”””
-url = f”https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages”
+url = f”https://graph.facebook.com/v18.0/{1138025436056275}/messages”
 headers = {
-“Authorization”: f”Bearer {ACCESS_TOKEN}”,
+“Authorization”: f”Bearer {EAAW66CLlGCsBRfmAKY3TWqDJGJZAxLpvTnqz4N8E5do34XVF98V3gy1xX98LszhJkC2Q9FD98g3fmUVHyKmWqhdq0VAh1zbyi5ESLQQs5CmFlm3UyPcLDg5uCYNk8QMcEw9XcrZC0ZAieLb4ymP2bWaUWuHyX9CqIKDjxRPFw0JyUcqevGDcsmZB8bYbO05nhR0PRx8OVXZAAFd2i1Y64JOag5i9uj3PdSf9PTSDmbvZALWEtiybgKx9ufoBd5qT5E0h9PJGnVLqLrW0MM7HFMDWDwaqpWSZC4j6AZDZD}”,
 “Content-Type”: “application/json”
 }
 data = {
@@ -61,7 +61,6 @@ data = {
 “text”: {“body”: text}
 }
 requests.post(url, headers=headers, json=data)
-
 def send_buttons(to, text, buttons):
 “””
 Send message with up to 3 clickable buttons
@@ -430,6 +429,5 @@ except Exception as e:
 
 return "OK", 200
 ```
-
 if **name** == “**main**”:
 app.run(debug=True, port=5000)

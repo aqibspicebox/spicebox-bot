@@ -14,7 +14,7 @@ PHONE_NUMBER_ID = "1138025436056275"
 
 MENU = {
     "desi": {
-        "Chicken Karahi": 700,
+        "Chicken Karahi": 1750,
         "Chicken Handi": 1250,
         "Mutton Karahi": 2100,
         "Chicken Biryani": 350,

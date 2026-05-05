@@ -11,14 +11,14 @@ PHONE_NUMBER_ID = "1138025436056275"
 # ── MENU WITH IMAGES ───────────────────
 MENU = {
     "desi": {
-        "Chicken Karahi": {"price": 700, "img": "https://imgur.com/a/tg5qcaX"},
-        "Chicken Handi": {"price": 1250, "img": "https://imgur.com/a/tg5qcaX"},
+        "Chicken Karahi": {"price": 700, "img": "https://i.imgur.com/qdFaIeM.png"},
+        "Chicken Handi": {"price": 1250, "img": "https://i.imgur.com/qdFaIeM.png"},
     },
     "chinese": {
         "Chicken Chowmein": {"price": 750, "img": "PUT_IMAGE_URL"},
     },
     "fries": {
-        "Pizza Fries": {"price": 470, "img": "https://imgur.com/7vDui2I"},
+        "Pizza Fries": {"price": 470, "img": "https://i.imgur.com/7vDui2I.png"},
     }
 }
 

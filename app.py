@@ -11,11 +11,11 @@ PHONE_NUMBER_ID = "1138025436056275"
 # ── MENU WITH IMAGES ───────────────────
 MENU = {
     "desi": {
-        "Chicken Karahi": {"price": 700, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
-        "Chicken Handi": {"price": 1250, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
+        "Chicken Karahi": {"price": 700, "img": "https://i.ibb.co/bg1cshn2/Chicken-Karahi.png"},
+        "Chicken Handi": {"price": 1250, "img": "https://i.ibb.co/Gb8S7qw/Chickenm-handi.png"},
     },
     "chinese": {
-        "Chicken Chowmein": {"price": 750, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
+        "Chicken Chowmein": {"price": 750, "img": "https://i.ibb.co/nNxjXzJ7/Chicken-Chowmein.png"},
     },
     "fries": {
         "Pizza Fries": {"price": 470, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},

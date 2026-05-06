@@ -255,6 +255,7 @@ _Freshly cooked ❤️""")
             return
 
     # ACTION
+    # ACTION
     if s["step"] == "action":
         if msg == "view_img":
             send_image(phone, s["selected"]["img"], s["selected"]["name"])
@@ -265,15 +266,16 @@ _Freshly cooked ❤️""")
 
         if msg == "add_item":
             s["step"] = "get_instruction"
-            send_text(phone,
-                f"📝 Any special instructions for *{s['selected']['name']}*?\n\n"
-                f"_(e.g. Extra spicy, No onions, Extra sauce)_\n\n"
-                f"Or type *none* if no changes needed")
+            send_buttons(phone,
+                f"📝 *Special instructions for:*\n*{s['selected']['name']}*\n\n"
+                f"_e.g. Extra spicy, No onions, Extra sauce_",
+                [{"id": "add_instruction", "title": "✏️ Add Instruction"},
+                 {"id": "no_instruction", "title": "✅ No Changes"}])
             return
 
         if msg == "go_back":
             s["step"] = "cuisine"
-            send_buttons(phone, "🍽️ Select Category:",
+            send_buttons(phone, "🍽️ *Select Category:*",
                 [{"id": "seekh", "title": "🥩 Seekh"},
                  {"id": "tikka", "title": "🍗 Tikka"},
                  {"id": "more_cat", "title": "📋 More..."}])
@@ -281,10 +283,24 @@ _Freshly cooked ❤️""")
 
     # SPECIAL INSTRUCTION
     if s["step"] == "get_instruction":
-        if msg == "none":
+        if msg == "no_instruction":
             s["selected"]["instruction"] = ""
-        else:
-            s["selected"]["instruction"] = text
+            s["cart"].append(s["selected"])
+            s["step"] = "more"
+            send_buttons(phone,
+                f"✅ *Added to cart!*\n\n🛒 *Your Cart:*\n{cart_text(s['cart'])}\n\n💰 *Total: {cart_total(s['cart'])} SAR*",
+                [{"id": "add_more", "title": "➕ Add More"},
+                 {"id": "checkout", "title": "🧾 Checkout"}])
+            return
+
+        if msg == "add_instruction":
+            s["step"] = "typing_instruction"
+            send_text(phone, "📝 *Please type your instruction:*\n\n_e.g. Extra spicy, No onions, Extra sauce_")
+            return
+
+    # TYPING INSTRUCTION
+    if s["step"] == "typing_instruction":
+        s["selected"]["instruction"] = text
         s["cart"].append(s["selected"])
         s["step"] = "more"
         send_buttons(phone,

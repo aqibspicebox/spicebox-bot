@@ -5,40 +5,20 @@ app = Flask(__name__)
 
 # ── Credentials ─────────────────────────
 VERIFY_TOKEN = "spicebox123"
-ACCESS_TOKEN = "PUT_NEW_TOKEN_HERE"
+ACCESS_TOKEN = "EAAW66CLlGCsBRWxKx52Q7ZBSg3aZCAESrLd7EKt47jw4YF11UkA6buV4GqRozdS8oS7a2Ww60s7vfypTvOxyne4p4MC11kCJk49WoKbzQ8ZCC4ZA77WZBha3ZCzZCqPQ3zdJXBVm1hpdiXr9ysApkZBkKnKOOjXyHVfIXi3zVSmxj2dMuFyCQ1kREOZCJZCyqnthx8YZCOualx0MxqUkabZB7JpApSdd7EKlLtJ3otdAxcqoI6ZAUmbqRvAwQ8FcFW1ToZAnz0hZA4bqB2YPvLjxxSOqEqyGgj0m8XU0ADZC8gZDZD"
 PHONE_NUMBER_ID = "1138025436056275"
 
-IMG = "https://i.ibb.co/hR3bJgT3/Fries.png"
-
-# ── FULL MENU ─────────────────────────
+# ── MENU WITH IMAGES ───────────────────
 MENU = {
-    "seekh": {
-        "Beef Seekh": {"price": 7, "img": IMG},
-        "Beef Seekh Combo": {"price": 20, "img": IMG},
-        "Chicken Seekh": {"price": 6, "img": IMG},
-        "Chicken Seekh Combo": {"price": 6, "img": IMG},
-        "Seekh Platter": {"price": 22, "img": IMG},
+    "desi": {
+        "Chicken Karahi": {"price": 700, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
+        "Chicken Handi": {"price": 1250, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
     },
-    "tikka": {
-        "Afghani Tikka": {"price": 8, "img": IMG},
-        "Red Tikka": {"price": 8, "img": IMG},
-        "Hariyali Tikka": {"price": 8, "img": IMG},
-        "Tikka Combo": {"price": 10, "img": IMG},
-        "Tikka Small Platter": {"price": 22, "img": IMG},
-        "Tikka Large Platter": {"price": 40, "img": IMG},
+    "chinese": {
+        "Chicken Chowmein": {"price": 750, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
     },
-    "galawti": {
-        "Kabab": {"price": 2.5, "img": IMG},
-        "Kabab Paratha": {"price": 5, "img": IMG},
-        "Bun Kabab": {"price": 4, "img": IMG},
-    },
-    "rolls": {
-        "Kabab Roll": {"price": 5, "img": IMG},
-        "Afghani Roll": {"price": 8, "img": IMG},
-        "Red Roll": {"price": 8, "img": IMG},
-        "Hariyali Roll": {"price": 8, "img": IMG},
-        "Chicken Seekh Roll": {"price": 8, "img": IMG},
-        "Beef Seekh Roll": {"price": 8, "img": IMG},
+    "fries": {
+        "Pizza Fries": {"price": 470, "img": "https://i.ibb.co/hR3bJgT3/Fries.png"},
     }
 }
 
@@ -71,6 +51,21 @@ def send_buttons(to, text, buttons):
     }
     requests.post(url, headers=headers, json=data)
 
+def send_list(to, text, sections):
+    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}", "Content-Type": "application/json"}
+    data = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "type": "interactive",
+        "interactive": {
+            "type": "list",
+            "body": {"text": text},
+            "action": {"button": "View Options","sections": sections}
+        }
+    }
+    requests.post(url, headers=headers, json=data)
+
 def send_image(to, image_url, caption=""):
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {"Authorization": f"Bearer {ACCESS_TOKEN}", "Content-Type": "application/json"}
@@ -85,20 +80,14 @@ def send_image(to, image_url, caption=""):
 # ── HELPERS ────────────────────────────
 def get_session(phone):
     if phone not in sessions:
-        sessions[phone] = {
-            "step": "welcome",
-            "cart": [],
-            "current_cuisine": "",
-            "name": "",
-            "address": ""
-        }
+        sessions[phone] = {"step": "welcome","cart": [],"current_cuisine": ""}
     return sessions[phone]
 
 def cart_total(cart):
     return sum(i["price"] for i in cart)
 
 def cart_text(cart):
-    return "\n".join([f"{i['name']} - {i['price']} SAR" for i in cart])
+    return "\n".join([f"• {i['name']} — Rs {i['price']}" for i in cart])
 
 # ── MAIN FLOW ─────────────────────────
 def handle_message(phone, text, button_id=None):
@@ -109,113 +98,78 @@ def handle_message(phone, text, button_id=None):
     if msg in ["hi","hello","start"] or s["step"]=="welcome":
         s["step"] = "main"
         send_buttons(phone,"Welcome! Choose:",
-            [{"id":"order","title":"Order Now"}])
+            [{"id":"order","title":"Order"},{"id":"menu","title":"Menu"}])
         return
 
     # MAIN
     if s["step"]=="main":
         if msg=="order":
             s["step"]="cuisine"
-            send_buttons(phone,"Select Category:",
-                [{"id":"seekh","title":"Seekh"},
-                 {"id":"tikka","title":"Tikka"},
-                 {"id":"more","title":"More"}])
+            send_buttons(phone,"Select cuisine:",
+                [{"id":"desi","title":"Desi"},{"id":"chinese","title":"Chinese"},{"id":"fries","title":"Fries"}])
             return
-
-    # MORE CATEGORY
-    if msg=="more":
-        s["step"]="cuisine"
-        send_buttons(phone,"More Categories:",
-            [{"id":"galawti","title":"Galawti"},
-             {"id":"rolls","title":"Rolls"}])
-        return
 
     # CUISINE
     if s["step"]=="cuisine":
-        if msg in MENU:
-            s["current_cuisine"]=msg
-            s["step"]="item"
+        s["current_cuisine"]=msg
+        s["step"]="item"
 
-            items = MENU[msg]
-            text_menu = "\n".join([
-                f"{i+1}. {name} - {data['price']} SAR"
-                for i,(name,data) in enumerate(items.items())
-            ])
+        rows=[]
+        for i,(name,data) in enumerate(MENU[msg].items()):
+            rows.append({"id":f"item_{i}","title":name,"description":f"Rs {data['price']}"})
 
-            send_text(phone,f"Select item:\n{text_menu}\nReply number")
-            return
+        send_list(phone,"Select item:",[{"title":"Menu","rows":rows}])
+        return
 
     # ITEM SELECT
     if s["step"]=="item":
-        try:
-            idx=int(text)-1
+        if msg.startswith("item_"):
+            idx=int(msg.split("_")[1])
             items=list(MENU[s["current_cuisine"]].items())
             name,data=items[idx]
 
             s["selected"]={"name":name,"price":data["price"],"img":data["img"]}
             s["step"]="action"
 
-            send_buttons(phone,f"{name} - {data['price']} SAR",
-                [{"id":"view","title":"Image"},
-                 {"id":"add","title":"Add"}])
-        except:
-            send_text(phone,"Invalid choice")
-        return
+            send_buttons(phone,
+                f"{name} — Rs {data['price']}",
+                [{"id":"view","title":"View Image"},{"id":"add","title":"Order Now"}])
+            return
 
     # ACTION
     if s["step"]=="action":
         if msg=="view":
             send_image(phone,s["selected"]["img"],s["selected"]["name"])
+            send_buttons(phone,"Next?",
+                [{"id":"add","title":"Order Now"},{"id":"back","title":"Back"}])
             return
 
         if msg=="add":
             s["cart"].append(s["selected"])
-            s["step"]="more2"
-
+            s["step"]="more"
             send_buttons(phone,
-                f"{cart_text(s['cart'])}\nTotal: {cart_total(s['cart'])} SAR",
-                [{"id":"more","title":"More"},
-                 {"id":"checkout","title":"Checkout"}])
+                f"Added!\n{cart_text(s['cart'])}\nTotal: {cart_total(s['cart'])}",
+                [{"id":"more","title":"Add More"},{"id":"checkout","title":"Checkout"}])
             return
 
-    # MORE / CHECKOUT
-    if s["step"]=="more2":
+        if msg=="back":
+            s["step"]="cuisine"
+            send_buttons(phone,"Select cuisine:",
+                [{"id":"desi","title":"Desi"},{"id":"chinese","title":"Chinese"},{"id":"fries","title":"Fries"}])
+            return
+
+    # MORE
+    if s["step"]=="more":
         if msg=="more":
             s["step"]="cuisine"
-            send_buttons(phone,"Select Category:",
-                [{"id":"seekh","title":"Seekh"},
-                 {"id":"tikka","title":"Tikka"},
-                 {"id":"more","title":"More"}])
+            send_buttons(phone,"Select cuisine:",
+                [{"id":"desi","title":"Desi"},{"id":"chinese","title":"Chinese"},{"id":"fries","title":"Fries"}])
             return
 
         if msg=="checkout":
-            s["step"]="get_name"
-            send_text(phone,"Enter name:")
+            send_text(phone,"Order placed! ✅")
+            sessions.pop(phone)
             return
-
-    # NAME
-    if s["step"]=="get_name":
-        s["name"]=text
-        s["step"]="get_address"
-        send_text(phone,"Enter address:")
-        return
-
-    # ADDRESS + FINAL
-    if s["step"]=="get_address":
-        s["address"]=text
-        total=cart_total(s["cart"])
-
-        receipt = (
-            f"Order Confirmed\n"
-            f"{s['name']}\n"
-            f"{s['address']}\n"
-            f"{cart_text(s['cart'])}\n"
-            f"Total: {total} SAR"
-        )
-
-        send_text(phone,receipt)
-        sessions.pop(phone)
-        return
 
 # ── WEBHOOK ───────────────────────────
 @app.route("/webhook", methods=["GET"])
@@ -232,8 +186,10 @@ def webhook():
         phone=msg["from"]
 
         if msg["type"]=="interactive":
-            handle_message(phone,msg["interactive"]["button_reply"]["id"],
-                           msg["interactive"]["button_reply"]["id"])
+            if "button_reply" in msg["interactive"]:
+                handle_message(phone,msg["interactive"]["button_reply"]["id"],msg["interactive"]["button_reply"]["id"])
+            elif "list_reply" in msg["interactive"]:
+                handle_message(phone,msg["interactive"]["list_reply"]["id"],msg["interactive"]["list_reply"]["id"])
         elif msg["type"]=="text":
             handle_message(phone,msg["text"]["body"])
     except:

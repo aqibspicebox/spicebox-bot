@@ -125,32 +125,18 @@ def send_receipt(phone, order_num, cart, name, mobile, address):
         if i.get("instruction"):
             items_text += f"\n      📝 _{i['instruction']}_"
 
-    customer_receipt = f"""╔══════════════════════════╗
+    customer_receipt = f"""
 🍽️   *PASSSHION COOKING*
       *RESTAURANT*
-╚══════════════════════════╝
-
 🧾 *ORDER RECEIPT*
-━━━━━━━━━━━━━━━━━━━━━━━━
 🔢 Order No: *#{order_num}*
 👤 Name: *{name}*
 📱 Mobile: *{mobile}*
 📍 Address: *{address}*
-━━━━━━━━━━━━━━━━━━━━━━━━
-
 🛒 *Items Ordered:*
 {items_text}
-
-━━━━━━━━━━━━━━━━━━━━━━━━
 💰 *Total: {total} SAR*
 ⏰ *Ready in: ~15 Minutes*
-━━━━━━━━━━━━━━━━━━━━━━━━
-
-📍 *Find Us:*
-Ibn Haitam, Arabian Street
-Al Aziziyah District, Jeddah
-_(Near Al Baik)_
-
 🙏 *Thank you for choosing*
 *Passshion Cooking Restaurant!*
 _We hope you enjoy your meal_ 😋❤️"""
@@ -208,20 +194,13 @@ def handle_message(phone, text, button_id=None):
         send_text(phone,
 """🌟 *Assalam o Alaikum!* 🌟
 
-╔══════════════════════════╗
-🍽️   *PASSSHION COOKING*
+   *PASSSHION COOKING*
       *RESTAURANT*
-╚══════════════════════════╝
 
 📍 Ibn Haitam, Arabian Street
     Al Aziziyah District, Jeddah
     _(Near Al Baik)_
-
-🥐 *Passion of Baking:*
-📍 Al Batarji Street
-    Az Zahra District, Jeddah
-
-_Freshly cooked with love_ ❤️""")
+_Freshly cooked ❤️""")
         send_buttons(phone, "What would you like to do?",
             [{"id": "order", "title": "🛒 Order Now"},
              {"id": "view_menu", "title": "📋 View Menu"}])

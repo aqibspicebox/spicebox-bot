@@ -11,15 +11,6 @@ OWNER_NUMBER = "966578042512"
 
 IMG = "https://i.ibb.co/hR3bJgT3/Fries.png"
 
-RESTAURANT_INFO = """🏪 *PASSSHION COOKING RESTAURANT*
-📍 Ibn Haitam, Arabian Street
-    Al Aziziyah District, Jeddah
-    (Near Al Baik)
-
-🥐 *Passion of Baking*
-📍 Al Batarji Street
-    Az Zahra District, Jeddah"""
-
 # ── ORDER COUNTER ──────────────────────
 def get_next_order_number():
     try:
@@ -41,32 +32,32 @@ def get_time():
 # ── MENU ───────────────────────────────
 MENU = {
     "seekh": {
-        "Beef Seekh": {"price": 7, "img": IMG},
-        "Beef Seekh Combo": {"price": 20, "img": IMG},
-        "Chicken Seekh": {"price": 6, "img": IMG},
-        "Chicken Seekh Combo": {"price": 6, "img": IMG},
-        "Seekh Platter": {"price": 22, "img": IMG},
+        "Beef Seekh": {"price": 7, "img": IMG, "desc": "1 Pc + Sauce"},
+        "Beef Seekh Combo": {"price": 20, "img": IMG, "desc": "3 pcs + 2 parathas + salad + 2 sauces"},
+        "Chicken Seekh": {"price": 6, "img": IMG, "desc": "1 Pc + Sauce"},
+        "Chicken Seekh Combo": {"price": 6, "img": IMG, "desc": "3 pcs + 2 parathas + salad + 2 sauces"},
+        "Seekh Platter": {"price": 22, "img": IMG, "desc": "2 pcs chicken + 2 pcs beef + 2 parathas + 2 sauces + salad"},
     },
     "tikka": {
-        "Afghani Tikka": {"price": 8, "img": IMG},
-        "Red Tikka": {"price": 8, "img": IMG},
-        "Hariyali Tikka": {"price": 8, "img": IMG},
-        "Tikka Combo": {"price": 10, "img": IMG},
-        "Tikka Small Platter": {"price": 22, "img": IMG},
-        "Tikka Large Platter": {"price": 40, "img": IMG},
+        "Afghani Tikka": {"price": 8, "img": IMG, "desc": "6 pcs tikka + salad & green sauce"},
+        "Red Tikka": {"price": 8, "img": IMG, "desc": "6 pcs tikka + salad & green sauce"},
+        "Hariyali Tikka": {"price": 8, "img": IMG, "desc": "6 pcs tikka + salad & green sauce"},
+        "Tikka Combo": {"price": 10, "img": IMG, "desc": "3 pcs afghani + 3 pcs red + 3 pcs hariyali + salad + 2 sauces"},
+        "Tikka Small Platter": {"price": 22, "img": IMG, "desc": "1 pcs beef seekh + 1 pcs chicken seekh + 3 pcs afghani tikka + 3 pcs red tikka + 3 pcs hariyali tikka + 2 parathas + 2 sauces + salad"},
+        "Tikka Large Platter": {"price": 40, "img": IMG, "desc": "2 pcs beef seekh + 2 pcs chicken seekh + 6 pcs afghani tikka + 6 pcs red tikka + 6 pcs hariyali tikka + 4 parathas + 4 sauces + salad"},
     },
     "galawti": {
-        "Kabab": {"price": 2.5, "img": IMG},
-        "Kabab Paratha": {"price": 5, "img": IMG},
-        "Bun Kabab": {"price": 4, "img": IMG},
+        "Kabab": {"price": 2.5, "img": IMG, "desc": "1 pc"},
+        "Kabab Paratha": {"price": 5, "img": IMG, "desc": "2 pcs kabab + 1 paratha + salad and green sauce"},
+        "Bun Kabab": {"price": 4, "img": IMG, "desc": "1 pcs kabab in bun with sauce"},
     },
     "rolls": {
-        "Kabab Roll": {"price": 5, "img": IMG},
-        "Afghani Roll": {"price": 8, "img": IMG},
-        "Red Roll": {"price": 8, "img": IMG},
-        "Hariyali Roll": {"price": 8, "img": IMG},
-        "Chicken Seekh Roll": {"price": 8, "img": IMG},
-        "Beef Seekh Roll": {"price": 8, "img": IMG},
+        "Kabab Roll": {"price": 5, "img": IMG, "desc": "2 pcs beef kabab + salad + green sauce"},
+        "Afghani Roll": {"price": 8, "img": IMG, "desc": "3 pcs chicken tikka + sauce"},
+        "Red Roll": {"price": 8, "img": IMG, "desc": "3 pcs chicken tikka + sauce"},
+        "Hariyali Roll": {"price": 8, "img": IMG, "desc": "3 pcs chicken tikka + sauce"},
+        "Chicken Seekh Roll": {"price": 8, "img": IMG, "desc": "3 pcs chicken seekh + sauce"},
+        "Beef Seekh Roll": {"price": 8, "img": IMG, "desc": "3 pcs beef seekh + sauce"},
     }
 }
 
@@ -126,55 +117,58 @@ def send_image(to, image_url, caption=""):
     requests.post(url, headers=headers, json=data)
 
 # ── RECEIPT ────────────────────────────
-def send_receipt(phone, order_num, cart, name, address):
+def send_receipt(phone, order_num, cart, name, mobile, address):
     total = cart_total(cart)
-    items_text = "\n".join([f"  ▪️ {i['name']} — {i['price']} SAR" for i in cart])
+    items_text = ""
+    for i in cart:
+        items_text += f"\n  ▪️ *{i['name']}* — {i['price']} SAR"
+        if i.get("instruction"):
+            items_text += f"\n      📝 _{i['instruction']}_"
 
-    customer_receipt = f"""╔══════════════════════╗
-🍽️  *PASSSHION COOKING*
-        *RESTAURANT*
-╚══════════════════════╝
+    customer_receipt = f"""╔══════════════════════════╗
+🍽️   *PASSSHION COOKING*
+      *RESTAURANT*
+╚══════════════════════════╝
 
 🧾 *ORDER RECEIPT*
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━
 🔢 Order No: *#{order_num}*
 👤 Name: *{name}*
+📱 Mobile: *{mobile}*
 📍 Address: *{address}*
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━
 
 🛒 *Items Ordered:*
 {items_text}
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━
 💰 *Total: {total} SAR*
-━━━━━━━━━━━━━━━━━━━━━━
+⏰ *Ready in: ~15 Minutes*
+━━━━━━━━━━━━━━━━━━━━━━━━
 
-📍 *Our Location:*
+📍 *Find Us:*
 Ibn Haitam, Arabian Street
 Al Aziziyah District, Jeddah
-(Near Al Baik)
-
-⏰ Your order is being
-   prepared with ❤️
+_(Near Al Baik)_
 
 🙏 *Thank you for choosing*
-*Passshion Cooking Restaurant!*"""
+*Passshion Cooking Restaurant!*
+_We hope you enjoy your meal_ 😋❤️"""
 
     owner_receipt = f"""🔔 *NEW ORDER ALERT!*
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━
 🔢 Order No: *#{order_num}*
-👤 Customer: *{name}*
-📱 Phone: *+{phone}*
+👤 Name: *{name}*
+📱 Mobile: *{mobile}*
 📍 Address: *{address}*
-━━━━━━━━━━━━━━━━━━━━━━
-
+━━━━━━━━━━━━━━━━━━━━━━━━
 🛒 *Items:*
 {items_text}
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━
 💰 *Total: {total} SAR*
 ⏰ Time: {get_time()}
-━━━━━━━━━━━━━━━━━━━━━━"""
+━━━━━━━━━━━━━━━━━━━━━━━━"""
 
     send_text(phone, customer_receipt)
     send_text(OWNER_NUMBER, owner_receipt)
@@ -187,6 +181,7 @@ def get_session(phone):
             "cart": [],
             "current_cuisine": "",
             "name": "",
+            "mobile": "",
             "address": ""
         }
     return sessions[phone]
@@ -195,7 +190,12 @@ def cart_total(cart):
     return sum(i["price"] for i in cart)
 
 def cart_text(cart):
-    return "\n".join([f"▪️ {i['name']} — {i['price']} SAR" for i in cart])
+    lines = ""
+    for i in cart:
+        lines += f"\n▪️ *{i['name']}* — {i['price']} SAR"
+        if i.get("instruction"):
+            lines += f"\n   📝 _{i['instruction']}_"
+    return lines.strip()
 
 # ── MAIN FLOW ─────────────────────────
 def handle_message(phone, text, button_id=None):
@@ -203,27 +203,33 @@ def handle_message(phone, text, button_id=None):
     msg = (button_id or text).lower().strip()
 
     # WELCOME
-    if msg in ["hi", "hello", "start"] or s["step"] == "welcome":
+    if msg in ["hi", "hello", "start", "salam", "السلام"] or s["step"] == "welcome":
         s["step"] = "main"
-        send_text(phone, f"""🌟 *Assalam o Alaikum!* 🌟
+        send_text(phone,
+"""🌟 *Assalam o Alaikum!* 🌟
 
-Welcome to
-╔══════════════════════╗
-🍽️  *PASSSHION COOKING*
-        *RESTAURANT*
-╚══════════════════════╝
+╔══════════════════════════╗
+🍽️   *PASSSHION COOKING*
+      *RESTAURANT*
+╚══════════════════════════╝
 
-{RESTAURANT_INFO}
+📍 Ibn Haitam, Arabian Street
+    Al Aziziyah District, Jeddah
+    _(Near Al Baik)_
+
+🥐 *Passion of Baking:*
+📍 Al Batarji Street
+    Az Zahra District, Jeddah
 
 _Freshly cooked with love_ ❤️""")
         send_buttons(phone, "What would you like to do?",
             [{"id": "order", "title": "🛒 Order Now"},
-             {"id": "menu", "title": "📋 View Menu"}])
+             {"id": "view_menu", "title": "📋 View Menu"}])
         return
 
     # MAIN
     if s["step"] == "main":
-        if msg in ["order", "menu"]:
+        if msg in ["order", "view_menu"]:
             s["step"] = "cuisine"
             send_buttons(phone, "🍽️ Select Category:",
                 [{"id": "seekh", "title": "🥩 Seekh"},
@@ -249,9 +255,9 @@ _Freshly cooked with love_ ❤️""")
                 rows.append({
                     "id": f"item_{i}",
                     "title": name[:24],
-                    "description": f"{data['price']} SAR"
+                    "description": f"{data['price']} SAR — {data['desc'][:50]}"
                 })
-            send_list(phone, f"🍽️ *{msg.title()}* Menu:",
+            send_list(phone, f"🍽️ *{msg.title()}* Menu — Select item:",
                 [{"title": msg.title(), "rows": rows}])
             return
 
@@ -264,30 +270,29 @@ _Freshly cooked with love_ ❤️""")
             s["selected"] = {"name": name, "price": data["price"], "img": data["img"]}
             s["step"] = "action"
             send_buttons(phone,
-                f"🍽️ *{name}*\n💰 Price: *{data['price']} SAR*",
-                [{"id": "view", "title": "🖼️ View Image"},
-                 {"id": "add", "title": "✅ Order Now"}])
+                f"🍽️ *{name}*\n📝 {data['desc']}\n💰 Price: *{data['price']} SAR*",
+                [{"id": "view_img", "title": "🖼️ View Image"},
+                 {"id": "add_item", "title": "✅ Add to Order"}])
             return
 
     # ACTION
     if s["step"] == "action":
-        if msg == "view":
+        if msg == "view_img":
             send_image(phone, s["selected"]["img"], s["selected"]["name"])
             send_buttons(phone, "What's next?",
-                [{"id": "add", "title": "✅ Order Now"},
-                 {"id": "back", "title": "🔙 Back"}])
+                [{"id": "add_item", "title": "✅ Add to Order"},
+                 {"id": "go_back", "title": "🔙 Back"}])
             return
 
-        if msg == "add":
-            s["cart"].append(s["selected"])
-            s["step"] = "more"
-            send_buttons(phone,
-                f"✅ *Added!*\n\n🛒 *Your Cart:*\n{cart_text(s['cart'])}\n\n💰 *Total: {cart_total(s['cart'])} SAR*",
-                [{"id": "add_more", "title": "➕ Add More"},
-                 {"id": "checkout", "title": "🧾 Checkout"}])
+        if msg == "add_item":
+            s["step"] = "get_instruction"
+            send_text(phone,
+                f"📝 Any special instructions for *{s['selected']['name']}*?\n\n"
+                f"_(e.g. Extra spicy, No onions, Extra sauce)_\n\n"
+                f"Or type *none* if no changes needed")
             return
 
-        if msg == "back":
+        if msg == "go_back":
             s["step"] = "cuisine"
             send_buttons(phone, "🍽️ Select Category:",
                 [{"id": "seekh", "title": "🥩 Seekh"},
@@ -295,7 +300,21 @@ _Freshly cooked with love_ ❤️""")
                  {"id": "more_cat", "title": "📋 More..."}])
             return
 
-    # MORE
+    # SPECIAL INSTRUCTION
+    if s["step"] == "get_instruction":
+        if msg == "none":
+            s["selected"]["instruction"] = ""
+        else:
+            s["selected"]["instruction"] = text
+        s["cart"].append(s["selected"])
+        s["step"] = "more"
+        send_buttons(phone,
+            f"✅ *Added to cart!*\n\n🛒 *Your Cart:*\n{cart_text(s['cart'])}\n\n💰 *Total: {cart_total(s['cart'])} SAR*",
+            [{"id": "add_more", "title": "➕ Add More"},
+             {"id": "checkout", "title": "🧾 Checkout"}])
+        return
+
+    # MORE / CHECKOUT
     if s["step"] == "more":
         if msg == "add_more":
             s["step"] = "cuisine"
@@ -307,23 +326,59 @@ _Freshly cooked with love_ ❤️""")
 
         if msg == "checkout":
             s["step"] = "get_name"
-            send_text(phone, "👤 Please enter your *Name*:")
+            send_text(phone, "👤 Please enter your *Full Name*:")
             return
 
     # GET NAME
     if s["step"] == "get_name":
         s["name"] = text
+        s["step"] = "get_mobile"
+        send_text(phone, "📱 Please enter your *Mobile Number*:")
+        return
+
+    # GET MOBILE
+    if s["step"] == "get_mobile":
+        s["mobile"] = text
         s["step"] = "get_address"
         send_text(phone, "📍 Please enter your *Delivery Address*:")
         return
 
-    # GET ADDRESS + SEND RECEIPT
+    # GET ADDRESS
     if s["step"] == "get_address":
         s["address"] = text
-        order_num = get_next_order_number()
-        send_receipt(phone, order_num, s["cart"], s["name"], s["address"])
-        sessions.pop(phone)
+        s["step"] = "confirm"
+        total = cart_total(s["cart"])
+        send_buttons(phone,
+            f"🧾 *Order Summary:*\n\n"
+            f"👤 {s['name']}\n"
+            f"📱 {s['mobile']}\n"
+            f"📍 {s['address']}\n\n"
+            f"🛒 *Items:*\n{cart_text(s['cart'])}\n\n"
+            f"💰 *Total: {total} SAR*\n\n"
+            f"✅ Confirm your order?",
+            [{"id": "confirm_yes", "title": "✅ Confirm"},
+             {"id": "confirm_no", "title": "❌ Cancel"}])
         return
+
+    # CONFIRM
+    if s["step"] == "confirm":
+        if msg == "confirm_yes":
+            order_num = get_next_order_number()
+            send_receipt(phone, order_num, s["cart"], s["name"], s["mobile"], s["address"])
+            send_text(phone,
+                f"🎉 *Order Placed Successfully!*\n\n"
+                f"⏰ Your order will be ready in *~15 minutes* ✅\n\n"
+                f"😋 Thank you for ordering!\n"
+                f"_We are preparing your food with love_ ❤️")
+            sessions.pop(phone)
+            return
+
+        if msg == "confirm_no":
+            sessions.pop(phone)
+            send_text(phone,
+                "❌ Order cancelled.\n\n"
+                "Type *hi* to start a new order anytime! 😊")
+            return
 
 # ── WEBHOOK ───────────────────────────
 @app.route("/webhook", methods=["GET"])
